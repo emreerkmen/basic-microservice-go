@@ -33,6 +33,7 @@ func main() {
 	})
 
 	// It actually creates a server
-	// we can bind an IP address instead of just port, but right now we bind all of IP addresses
+	// we can bind an IP address instead of just port, 
+	// but right now we are binding all of IP addresses because of absence of prefix port number
 	http.ListenAndServe(":9090", nil)
 }
