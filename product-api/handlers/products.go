@@ -14,7 +14,19 @@ func NewProducts(l *log.Logger) *Products {
 	return &Products{l}
 }
 
-func (g *Products) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+func (p *Products) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		p.getProducts(rw, r)
+		return
+	}
+
+	//catch others
+
+	rw.WriteHeader(http.StatusMethodNotAllowed)
+
+}
+
+func (p *Products) getProducts(rw http.ResponseWriter, r *http.Request) {
 	listOfProducts := data.GetProducts()
 
 	// That usage is much slower acording to NewEncodeer method that places in product structs.
