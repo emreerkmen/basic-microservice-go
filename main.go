@@ -2,7 +2,7 @@ package main
 
 import (
 	"basic-microservice/hello/hello"
-	"basic-microservice/hello/working/handlers"
+	"basic-microservice/hello/product-api/handlers"
 	"context"
 	"fmt"
 	"io/ioutil"
@@ -42,10 +42,12 @@ func main() {
 	l := log.New(os.Stdout, "product-api", log.LstdFlags)
 	helloHandler := handlers.NewHello(l)
 	goodbyeHandler := handlers.NewGoodbye(l)
+	productsHandler := handlers.NewProducts(l)
 
 	serveMux := http.NewServeMux()
 	serveMux.Handle("/hello", helloHandler)
 	serveMux.Handle("/goodbye", goodbyeHandler)
+	serveMux.Handle("/products", productsHandler)
 
 	// in video idle timeout info is important. Until that timeount is finished, the connection remains open
 	// and do not need to hand shake again
@@ -72,11 +74,11 @@ func main() {
 		}
 	}()
 
-	signalChannel := make(chan os.Signal,2)
+	signalChannel := make(chan os.Signal, 2)
 	signal.Notify(signalChannel, os.Interrupt)
 	signal.Notify(signalChannel, os.Kill)
 
-	signals := <- signalChannel
+	signals := <-signalChannel
 	l.Println("Recieved terminate, graceful shutdown", signals)
 
 	timeoutContext, _ := context.WithTimeout(context.Background(), 30*time.Second)
