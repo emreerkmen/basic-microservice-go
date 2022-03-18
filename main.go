@@ -47,7 +47,7 @@ func main() {
 	serveMux := http.NewServeMux()
 	serveMux.Handle("/hello", helloHandler)
 	serveMux.Handle("/goodbye", goodbyeHandler)
-	serveMux.Handle("/products", productsHandler)
+	serveMux.Handle("/", productsHandler)
 
 	// in video idle timeout info is important. Until that timeount is finished, the connection remains open
 	// and do not need to hand shake again
