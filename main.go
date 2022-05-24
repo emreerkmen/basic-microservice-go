@@ -11,7 +11,10 @@ import (
 	"os"
 	"os/signal"
 	"time"
+	"github.com/nicholasjackson/env"
 )
+
+var bindAddress = env.String("BIND_ADDRESS", false, ":9090", "Bind address for the server")
 
 func main() {
 	fmt.Println("Hello, World!")
@@ -52,12 +55,14 @@ func main() {
 	// in video idle timeout info is important. Until that timeount is finished, the connection remains open
 	// and do not need to hand shake again
 	// we can tune that values for requirements
-	server := &http.Server{
-		Addr:         ":9090",
-		Handler:      serveMux,
-		IdleTimeout:  120 * time.Second,
-		ReadTimeout:  1 * time.Second,
-		WriteTimeout: 1 * time.Second,
+	// create a new server
+	server := http.Server{
+		Addr:         *bindAddress,      // configure the bind address
+		Handler:      serveMux,                // set the default handler
+		ErrorLog:     l,                 // set the logger for the server
+		ReadTimeout:  5 * time.Second,   // max time to read request from the client
+		WriteTimeout: 10 * time.Second,  // max time to write response to the client
+		IdleTimeout:  120 * time.Second, // max time for connections using TCP Keep-Alive
 	}
 
 	// It actually creates a server
