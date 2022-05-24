@@ -2,7 +2,7 @@ package main
 
 import (
 	"basic-microservice/hello/hello"
-	"basic-microservice/hello/product-api/handlers"
+	"basic-microservice/hello/product-api/handlers_gorilla"
 	"context"
 	"fmt"
 	"io/ioutil"
@@ -11,10 +11,10 @@ import (
 	"os"
 	"os/signal"
 	"time"
-	"github.com/nicholasjackson/env"
+	"github.com/gorilla/mux"
 )
 
-var bindAddress = env.String("BIND_ADDRESS", false, ":9090", "Bind address for the server")
+//var bindAddress = env.String("BIND_ADDRESS", false, ":9090", "Bind address for the server")
 
 func main() {
 	fmt.Println("Hello, World!")
@@ -40,25 +40,24 @@ func main() {
 		log.Println("Hello from test path!!!")
 	})
 
-	/*--------Video 2--------*/
-
 	l := log.New(os.Stdout, "product-api", log.LstdFlags)
-	helloHandler := handlers.NewHello(l)
-	goodbyeHandler := handlers.NewGoodbye(l)
 	productsHandler := handlers.NewProducts(l)
 
-	serveMux := http.NewServeMux()
-	serveMux.Handle("/hello", helloHandler)
-	serveMux.Handle("/goodbye", goodbyeHandler)
-	serveMux.Handle("/", productsHandler)
+	router := mux.NewRouter();
+	subGetRouter := router.Methods(http.MethodGet).Subrouter();
+	subGetRouter.HandleFunc("/", productsHandler.GetProducts)
+
+	subPutRouter := router.Methods(http.MethodPut).Subrouter();
+	//Gorilla automaticly understand to use regex when see curly brackets
+	subPutRouter.HandleFunc("/{id:[0-9]+}", productsHandler.UpdateProducts)
 
 	// in video idle timeout info is important. Until that timeount is finished, the connection remains open
 	// and do not need to hand shake again
 	// we can tune that values for requirements
 	// create a new server
 	server := http.Server{
-		Addr:         *bindAddress,      // configure the bind address
-		Handler:      serveMux,                // set the default handler
+		Addr:         ":9090",      // configure the bind address
+		Handler:      router,                // set the default handler
 		ErrorLog:     l,                 // set the logger for the server
 		ReadTimeout:  5 * time.Second,   // max time to read request from the client
 		WriteTimeout: 10 * time.Second,  // max time to write response to the client
