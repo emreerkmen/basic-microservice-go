@@ -4,6 +4,9 @@ import (
 	"basic-microservice/hello/product-api/data"
 	"log"
 	"net/http"
+	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 type Products struct {
@@ -53,8 +56,16 @@ func (p *Products) addProduct(rw http.ResponseWriter, r *http.Request) {
 	p.l.Printf("Product %#v", product)
 	data.AddProduct(product)
 }
-func (p *Products) updateProducts(id int, rw http.ResponseWriter, r*http.Request) {
-	p.l.Println("Handle PUT Product")
+func (p *Products) UpdateProducts(rw http.ResponseWriter, r*http.Request) {
+
+	//Gorilla extract variables from url automaticly.
+	vars := mux.Vars(r);
+	id, error := strconv.Atoi(vars["id"])
+	if error != nil {
+		http.Error(rw, "Unable to extract id", http.StatusBadRequest)
+	}
+	
+	p.l.Println("Handle PUT Product",id)
 
 	prod := &data.Product{}
 
