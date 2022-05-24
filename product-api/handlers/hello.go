@@ -12,7 +12,7 @@ type Hello struct {
 }
 
 // When write test, we don't have to think about how we can inject mock log object.
-// We can use that beautiful constructır for this.
+// We can use that beautiful constructor for this.
 // We try to do kind of Dependency Injection.
 func NewHello(l *log.Logger) *Hello{
 	return &Hello{l}
