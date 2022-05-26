@@ -51,6 +51,9 @@ func main() {
 	//Gorilla automaticly understand to use regex when see curly brackets
 	subPutRouter.HandleFunc("/{id:[0-9]+}", productsHandler.UpdateProducts)
 
+	subPostRouter := router.Methods(http.MethodPost).Subrouter()
+	subPostRouter.HandleFunc("/", productsHandler.AddProduct)
+
 	// in video idle timeout info is important. Until that timeount is finished, the connection remains open
 	// and do not need to hand shake again
 	// we can tune that values for requirements
