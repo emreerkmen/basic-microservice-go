@@ -12,6 +12,7 @@ import (
 	"os/signal"
 	"time"
 	"github.com/gorilla/mux"
+	"github.com/nicholasjackson/env"
 )
 
 //var bindAddress = env.String("BIND_ADDRESS", false, ":9090", "Bind address for the server")
