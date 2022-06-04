@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/signal"
 	"time"
+
 	"github.com/gorilla/mux"
 	"github.com/nicholasjackson/env"
 )
@@ -18,8 +19,8 @@ import (
 var bindAddress = env.String("BIND_ADDRESS", false, ":9090", "Bind address for the server")
 
 func main() {
-	env.Parse()	
-	
+	env.Parse()
+
 	fmt.Println("Hello, World!")
 	hello.Hello()
 
@@ -53,9 +54,11 @@ func main() {
 	subPutRouter := router.Methods(http.MethodPut).Subrouter()
 	//Gorilla automaticly understand to use regex when see curly brackets
 	subPutRouter.HandleFunc("/{id:[0-9]+}", productsHandler.UpdateProducts)
+	subPutRouter.Use(productsHandler.MiddlewareValidateProduct)
 
 	subPostRouter := router.Methods(http.MethodPost).Subrouter()
 	subPostRouter.HandleFunc("/", productsHandler.AddProduct)
+	subPostRouter.Use(productsHandler.MiddlewareValidateProduct)
 
 	// in video idle timeout info is important. Until that timeount is finished, the connection remains open
 	// and do not need to hand shake again
