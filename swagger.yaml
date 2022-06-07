@@ -1,0 +1,60 @@
+basePath: /
+consumes:
+- application/json
+definitions:
+  Product:
+    description: Product defines the structure for an API product
+    properties:
+      description:
+        type: string
+        x-go-name: Description
+      id:
+        format: int64
+        type: integer
+        x-go-name: ID
+      name:
+        type: string
+        x-go-name: Name
+      price:
+        format: float
+        type: number
+        x-go-name: Price
+      sku:
+        type: string
+        x-go-name: SKU
+    type: object
+    x-go-package: github.com/PacktPublishing/Building-Microservices-with-Go-Second-Edition/product-api/8_validation/data
+info:
+  description: Documentation for Product API
+  title: of Product API
+  version: 1.0.0
+paths:
+  /products:
+    get:
+      description: Return a list of products from the database
+      operationId: listProducts
+      responses:
+        "200":
+          $ref: '#/responses/productsResponse'
+      tags:
+      - products
+produces:
+- application/json
+responses:
+  errorResponse:
+    description: |-
+      NOTE: Types defined here are purely for documentation purposes
+      these types are not used by any of the handers
+
+      Generic error message returned as a string
+    schema:
+      items:
+        $ref: '#/definitions/Product'
+      type: array
+  productResponse:
+    description: Data structure representing a single product
+    schema:
+      $ref: '#/definitions/Product'
+schemes:
+- http
+swagger: "2.0"

@@ -60,6 +60,8 @@ func main() {
 	subPostRouter.HandleFunc("/", productsHandler.AddProduct)
 	subPostRouter.Use(productsHandler.MiddlewareValidateProduct)
 
+	// router for redoc
+
 	// in video idle timeout info is important. Until that timeount is finished, the connection remains open
 	// and do not need to hand shake again
 	// we can tune that values for requirements
