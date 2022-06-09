@@ -40,7 +40,7 @@ func (p *Products) GetProducts(rw http.ResponseWriter, r *http.Request) {
 		rw.Write(json)
 	*/
 
-	err := listOfProducts.ToJSON(rw)
+	err := data.ToJSON(listOfProducts,rw)
 
 	if err != nil {
 		http.Error(rw, "Unable to encode json", http.StatusInternalServerError)
@@ -56,18 +56,13 @@ func (p *Products) AddProduct(rw http.ResponseWriter, r *http.Request) {
 }
 func (p *Products) UpdateProducts(rw http.ResponseWriter, r *http.Request) {
 
-	//Gorilla extract variables from url automaticly.
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		http.Error(rw, "Unable to extract id", http.StatusBadRequest)
-	}
+	id := getProductID(r)
 
 	p.l.Println("Handle PUT Product", id)
 
 	prod := r.Context().Value(KeyProduct{}).(data.Product)
 
-	err = data.UpdateProduct(id, &prod)
+	err := data.UpdateProduct(id, &prod)
 	if err == data.ErrProductNotFound {
 		http.Error(rw, "Product not found", http.StatusNotFound)
 		return
@@ -85,7 +80,7 @@ func (p Products) MiddlewareValidateProduct(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		prod := data.Product{}
 
-		err := prod.FromJSON(r.Body)
+		err := data.FromJSON(prod,r.Body)
 		if err != nil {
 			p.l.Println("[ERROR] deserializing product", err)
 			http.Error(rw, "Error reading product", http.StatusBadRequest)
@@ -111,6 +106,59 @@ func (p Products) MiddlewareValidateProduct(next http.Handler) http.Handler {
 		// Call the next handler, which can be another middleware in the chain, or the final handler.
 		next.ServeHTTP(rw, req)
 	})
+}
+
+// swagger:route DELETE /products/{id} products deleteProduct
+// Update a products details
+//
+// responses:
+//	201: noContentResponse
+//  404: errorResponse
+//  501: errorResponse
+
+// Delete handles DELETE requests and removes items from the database
+func (p *Products) Delete(rw http.ResponseWriter, r *http.Request) {
+	id := getProductID(r)
+
+	p.l.Println("[DEBUG] deleting record id", id)
+
+	err := data.DeleteProduct(id)
+	if err == data.ErrProductNotFound {
+		p.l.Println("[ERROR] deleting record id does not exist")
+
+		rw.WriteHeader(http.StatusNotFound)
+		data.ToJSON(&GenericError{Message: err.Error()}, rw)
+		return
+	}
+
+	if err != nil {
+		p.l.Println("[ERROR] deleting record", err)
+
+		rw.WriteHeader(http.StatusInternalServerError)
+		data.ToJSON(&GenericError{Message: err.Error()}, rw)
+		return
+	}
+
+	rw.WriteHeader(http.StatusNoContent)
+}
+
+// getProductID returns the product ID from the URL
+// Panics if cannot convert the id into an integer
+// this should never happen as the router ensures that
+// this is a valid number
+func getProductID(r *http.Request) int {
+	// parse the product id from the url
+	// Gorilla extract variables from url automaticly.
+	vars := mux.Vars(r)
+
+	// convert the id into an integer and return
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		// should never happen
+		panic(err)
+	}
+
+	return id
 }
 
 // GenericError is a generic error message returned by a server

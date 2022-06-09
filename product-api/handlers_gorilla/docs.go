@@ -16,7 +16,7 @@
 package handlers
 
 import "github.com/PacktPublishing/Building-Microservices-with-Go-Second-Edition/product-api/8_validation/data"
-/*
+
 //
 // NOTE: Types defined here are purely for documentation purposes
 // these types are not used by any of the handers
@@ -36,7 +36,7 @@ type errorValidationWrapper struct {
 	// in: body
 	Body ValidationError
 }
-*/
+
 // A list of products
 // swagger:response productsResponse
 type productsResponseWrapper struct {
@@ -52,7 +52,7 @@ type productResponseWrapper struct {
 	// in: body
 	Body data.Product
 }
-/*
+
 // No content is returned by this API endpoint
 // swagger:response noContentResponse
 type noContentResponseWrapper struct {
@@ -82,4 +82,4 @@ type productIDParamsWrapper struct {
 	// in: path
 	// required: true
 	ID int `json:"id"`
-}*/
+}

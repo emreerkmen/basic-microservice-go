@@ -11,7 +11,7 @@ import (
 	"os"
 	"os/signal"
 	"time"
-
+	"github.com/go-openapi/runtime/middleware"
 	"github.com/gorilla/mux"
 	"github.com/nicholasjackson/env"
 )
@@ -60,7 +60,12 @@ func main() {
 	subPostRouter.HandleFunc("/", productsHandler.AddProduct)
 	subPostRouter.Use(productsHandler.MiddlewareValidateProduct)
 
-	// router for redoc
+	// handler for documentation
+	opts := middleware.RedocOpts{SpecURL: "/swagger.yaml"}
+	sh := middleware.Redoc(opts, nil)
+
+	subGetRouter.Handle("/docs", sh)
+	subGetRouter.Handle("/swagger.yaml", http.FileServer(http.Dir("./")))
 
 	// in video idle timeout info is important. Until that timeount is finished, the connection remains open
 	// and do not need to hand shake again

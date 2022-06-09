@@ -79,7 +79,7 @@ func (p *Products) getProducts(rw http.ResponseWriter, r *http.Request) {
 		rw.Write(json)
 	*/
 
-	err := listOfProducts.ToJSON(rw)
+	err := data.ToJSON(listOfProducts,rw)
 
 	if err != nil {
 		http.Error(rw, "Unable to encode json", http.StatusInternalServerError)
@@ -93,7 +93,7 @@ func (p *Products) addProduct(rw http.ResponseWriter, r *http.Request) {
 	// Golang use reader for request body. It actually buffered some stuff and read but not read all of the request at that time
 	// It just read request body. Think of 10 gb file in request. In this scnerio you don't have to read all the respoanse expect body.
 	// Actally it reads progressively. I wish there is a madium post about it.
-	err := product.FromJSON(r.Body)
+	err := data.FromJSON(product,r.Body)
 
 	if err != nil {
 		p.l.Printf("Product %v", err)
@@ -108,7 +108,7 @@ func (p *Products) updateProducts(id int, rw http.ResponseWriter, r*http.Request
 
 	prod := &data.Product{}
 
-	err := prod.FromJSON(r.Body)
+	err := data.FromJSON(prod,r.Body)
 	if err != nil {
 		http.Error(rw, "Unable to unmarshal json", http.StatusBadRequest)
 	}
