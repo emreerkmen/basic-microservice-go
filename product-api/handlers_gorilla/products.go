@@ -19,15 +19,19 @@ func NewProducts(l *log.Logger) *Products {
 	return &Products{l}
 }
 
-// swagger:route GET /products products listProducts
+// swagger:route GET / products listProducts
 // Return a list of products from the database
 // responses:
-//	200: productsResponse
+//  200: productsResponse
+//	201: noContentResponse
+//  404: errorResponse
+//  501: errorResponse
 
 // ListAll handles GET requests and returns all current products
 func (p *Products) GetProducts(rw http.ResponseWriter, r *http.Request) {
 	p.l.Println("Handle GET Products")
 	listOfProducts := data.GetProducts()
+	rw.Header().Add("Content-Type", "application/json")
 
 	// That usage is much slower acording to NewEncodeer method that places in product structs.
 	/*
