@@ -14,6 +14,7 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/gorilla/mux"
 	"github.com/nicholasjackson/env"
+	gohandlers "github.com/gorilla/handlers"
 )
 
 var bindAddress = env.String("BIND_ADDRESS", false, ":9090", "Bind address for the server")
@@ -67,13 +68,16 @@ func main() {
 	subGetRouter.Handle("/docs", sh)
 	subGetRouter.Handle("/swagger.yaml", http.FileServer(http.Dir("./")))
 
+	// CORS
+	ch := gohandlers.CORS(gohandlers.AllowedOrigins([]string{"*"}))
+
 	// in video idle timeout info is important. Until that timeount is finished, the connection remains open
 	// and do not need to hand shake again
 	// we can tune that values for requirements
 	// create a new server
 	server := http.Server{
 		Addr:         *bindAddress,      //":9090",      // configure the bind address
-		Handler:      router,            // set the default handler
+		Handler:      ch(router),            // set the default handler
 		ErrorLog:     l,                 // set the logger for the server
 		ReadTimeout:  5 * time.Second,   // max time to read request from the client
 		WriteTimeout: 10 * time.Second,  // max time to write response to the client
