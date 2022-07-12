@@ -10,3 +10,7 @@ swagger:
 
 generate_client:
 	swagger generate client -f ./swagger.yaml -A product_api
+
+proto:
+	protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative protos/currency.proto
+ 
